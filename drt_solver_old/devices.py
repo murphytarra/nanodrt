@@ -78,6 +78,6 @@ class Device(eqx.Module):
 
         integral_im = vmap(self.integrand_im, in_axes=(0))(self.f_vec)
         Z_im = (
-            trapezoid(self.log_t_vec, integral_im) + +2 * jnp.pi * self.f_vec * self.L_0
+            trapezoid(self.log_t_vec, integral_im) + 2 * jnp.pi * self.f_vec * self.L_0
         )
         return Z_re, Z_im

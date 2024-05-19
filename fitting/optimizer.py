@@ -23,6 +23,8 @@ class Optimizer(eqx.Module):
     # solver used to fit the data
     solver: str = dataclasses.field(default="regression")  # type: ignore
 
+    integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
+
     # Dictionary of solvers used for fitting
     solver_dict: dict[str:float] = dataclasses.field(default=None)  #  type: ignore
 
@@ -31,6 +33,7 @@ class Optimizer(eqx.Module):
         measurement: Measurement,
         drt: DRT,
         solver: str = "regression",
+        integration_method: str = "trapezoid",
         solver_dict: dict[str, float] = None,
     ) -> None:
         """
@@ -52,6 +55,8 @@ class Optimizer(eqx.Module):
 
         # Type of solver used
         self.solver = solver.lower()
+
+        self.integration_method = integration_method.lower()
 
         # Hyperparameters for the solving method
         self.solver_dict = solver_dict
@@ -99,6 +104,7 @@ class Optimizer(eqx.Module):
                 measurement=self.measurement,
                 drt=self.drt,
                 solver_dict=self.solver_dict,
+                integration_method=self.integration_method,
             )
             fit = regression()
             return fit

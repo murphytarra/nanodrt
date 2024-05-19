@@ -9,7 +9,7 @@ from jax import config
 
 # Ask about typechecking again? Look up...
 from drt_solver.device import DRT
-from drt_solver.solvers import TrapezoidalSolver
+from drt_solver.solvers import TrapezoidalSolver, RBFSolver
 
 config.update("jax_enable_x64", True)
 
@@ -38,9 +38,7 @@ class Simulation(eqx.Module):
         )
 
     def __init__(
-        self,
-        drt: DRT,
-        f_vec: jnp.ndarray,  # integration_method: str = "trapezoid"
+        self, drt: DRT, f_vec: jnp.ndarray, integration_method: str = "trapezoid"
     ) -> None:
         """Class for simulation of DRT spectrum
 
@@ -56,7 +54,7 @@ class Simulation(eqx.Module):
         self.f_vec = f_vec
 
         # Method of integration used when calculating DRT spectum
-        self.integration_method = "trapezoid"  # integration_method
+        self.integration_method = integration_method
 
         # Logarthm of time constants
         self.log_t_vec = jnp.log(self.drt.tau)
@@ -81,10 +79,10 @@ class Simulation(eqx.Module):
             raise TypeError(
                 f"Expected integration_method to be a string, got {type(self.integration_method)}"
             )
-        if self.integration_method != "trapezoid":
-            raise ValueError(
-                f"Unsupported integration method: {self.integration_method}"
-            )
+        # if self.integration_method != "trapezoid":
+        #     raise ValueError(
+        #         f"Unsupported integration method: {self.integration_method}"
+        # )
 
     @eqx.filter_jit
     def run(
@@ -93,6 +91,14 @@ class Simulation(eqx.Module):
 
         if self.integration_method == "trapezoid":
             integrals = TrapezoidalSolver(
+                drt=self.drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
+            )
+            integration = integrals()
+            Z_re = self.drt.R_inf + integration[0]
+            Z_im = 2 * jnp.pi * self.f_vec * self.drt.L_0 + integration[1]
+
+        if self.integration_method == "rbf":
+            integrals = RBFSolver(
                 drt=self.drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
             )
             integration = integrals()

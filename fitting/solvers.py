@@ -3,10 +3,12 @@
 import equinox as eqx
 import jax.numpy as jnp
 import jaxopt
+import dataclasses
 
 # Ask about typechecking again? Look up...
 from drt_solver.device import DRT, Measurement, FittedSpectrum
 from drt_solver.simulaton import Simulation
+from drt_solver.solvers import RBFSolver
 
 
 class Regression(eqx.Module):
@@ -22,6 +24,10 @@ class Regression(eqx.Module):
 
     # Dictionary containing hyperparameters for solver
     solver_dict: dict[str, float]
+
+    integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
+
+    A_matrices: jnp.ndarray = dataclasses.field(default="None")  # type: ignore
 
     @eqx.filter_jit()
     def __call__(
@@ -40,8 +46,26 @@ class Regression(eqx.Module):
         # Extract number of steps
         maxiter = self.solver_dict["maxiter"]
 
-        # Perform solver LBFGS - future give user ability to adjust?
-        solver = jaxopt.LBFGS(fun=self.loss_function, maxiter=maxiter)
+        # build simulator initial here
+
+        if self.integration_method == "trapezoid":
+            # calculate A matrices by building simulator
+
+            # How to switch the loss function?
+
+            # Perform solver LBFGS - future give user ability to adjust?
+            solver = jaxopt.LBFGS(fun=self.loss_function, maxiter=maxiter)
+
+        if self.integration_method == "rbf":
+            # Calculate A matrices and save as self.A_matrix
+            integrals = RBFSolver(
+                drt=self.drt, f_vec=self.measurement.f, log_t_vec=jnp.log(self.drt.tau)
+            )
+            integ = integrals()
+            self.A_matrices = integ.A_matrix()
+
+            # define solver for new loss function
+            solver = jaxopt.LBFGS(fun=self.loss_function_rbf, maxiter=maxiter)
 
         # Initial Parameters to be fitted in optimization process
         init_params = jnp.hstack((self.drt.R_inf, self.drt.L_0, self.drt.gamma))
