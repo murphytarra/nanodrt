@@ -6,10 +6,9 @@ import dataclasses
 import jax.numpy as jnp
 from jax import config
 
-
 # Ask about typechecking again? Look up...
-from drt_solver.device import DRT
-from drt_solver.solvers import TrapezoidalSolver, RBFSolver
+from nanodrt.drt_solver.drt import DRT
+from nanodrt.drt_solver.solvers import TrapezoidalSolver, RBFSolver
 
 config.update("jax_enable_x64", True)
 
@@ -25,7 +24,7 @@ class Simulation(eqx.Module):
     # frequencies to simulate the DRT spectrum with
     f_vec: jnp.ndarray  # type: ignore
 
-    # Method of integration used to simulate DRT spectrum
+    # Method of integration used to simulate DRT spectrum - at the moment this is either 'trapezoid' or 'rbf'
     integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
 
     # Logarithm of tau vector
@@ -43,8 +42,10 @@ class Simulation(eqx.Module):
         """Class for simulation of DRT spectrum
 
         Args:
-            drt (DRT): DRT object containing drt spectrum and time constants
+             drt (DRT): DRT object containing drt spectrum and time constants
             integration_method (str, optional): Method used to determine integral throughout simulation. Defaults to "trapezoid".
+            f_vec (jnp.ndarray): frequencies used in Measurmment object to determine the impedence.
+
         """
 
         # DRT object containing the DRT spectrum and time constants
@@ -88,6 +89,11 @@ class Simulation(eqx.Module):
     def run(
         self,
     ):
+        """Function which selects and runs the solver to determine the impedence
+
+        Returns:
+            jnp.ndarray: Real and Imaginary impedence values
+        """
 
         if self.integration_method == "trapezoid":
             integrals = TrapezoidalSolver(
@@ -102,6 +108,8 @@ class Simulation(eqx.Module):
                 drt=self.drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
             )
             integration = integrals()
-            Z_re = self.drt.R_inf + integration[0]
-            Z_im = 2 * jnp.pi * self.f_vec * self.drt.L_0 + integration[1]
+            Z_re = self.drt.R_inf + integration[0] @ self.drt.gamma
+            Z_im = (
+                2 * jnp.pi * self.f_vec * self.drt.L_0 + integration[1] @ self.drt.gamma
+            )
         return Z_re, Z_im

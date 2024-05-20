@@ -3,10 +3,11 @@
 import equinox as eqx
 import dataclasses
 import jax.numpy as jnp
-from fitting.solvers import Regression
+from nanodrt.fitting.regression import Regression
 
 # Ask about typechecking again? Look up...
-from drt_solver.device import DRT, Measurement
+from nanodrt.drt_solver.drt import DRT
+from nanodrt.drt_solver.measurements import ImpedenceMeasurement
 
 
 class Optimizer(eqx.Module):
@@ -15,7 +16,7 @@ class Optimizer(eqx.Module):
     """
 
     # Measurment object containing experimental data
-    measurement: Measurement
+    measurement: ImpedenceMeasurement
 
     # DRT containing intitial guess for parameters and spectrum to be fitted
     drt: DRT
@@ -23,6 +24,7 @@ class Optimizer(eqx.Module):
     # solver used to fit the data
     solver: str = dataclasses.field(default="regression")  # type: ignore
 
+    # Integration Method used in the simulation
     integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
 
     # Dictionary of solvers used for fitting
@@ -30,7 +32,7 @@ class Optimizer(eqx.Module):
 
     def __init__(
         self,
-        measurement: Measurement,
+        measurement: ImpedenceMeasurement,
         drt: DRT,
         solver: str = "regression",
         integration_method: str = "trapezoid",
@@ -41,8 +43,9 @@ class Optimizer(eqx.Module):
 
         Args:
             measurement (Measurement): Measurement Object containing experimental data
+            drt (DRT): DRT object used for the simulation process.
             solver (str, optional): Method of solving used. Defaults to regression.
-            params (jnp.ndarray, optional): Initial guess for parameters used. Defaults to None.
+            integration_method: Method used in simulation process to determine the impedence.
             solver_dict (dict): Dictionary of values used for optimisation process. Dictionary types depend on process used.
 
         """
@@ -56,6 +59,7 @@ class Optimizer(eqx.Module):
         # Type of solver used
         self.solver = solver.lower()
 
+        # Integration Method used in simulation process
         self.integration_method = integration_method.lower()
 
         # Hyperparameters for the solving method
@@ -71,7 +75,7 @@ class Optimizer(eqx.Module):
 
     def __validate_init__(self) -> None:
         """Validate the initialization parameters."""
-        if not isinstance(self.measurement, Measurement):
+        if not isinstance(self.measurement, ImpedenceMeasurement):
             raise TypeError(
                 f"Expected measurement to be an instance of Measurement, got {type(self.measurement)}"
             )
@@ -91,7 +95,7 @@ class Optimizer(eqx.Module):
     @eqx.filter_jit()
     def run(
         self,
-    ):  # what does this return? simulate object?
+    ):
         """
         Runs the simulation based on the type of solver selected
 
