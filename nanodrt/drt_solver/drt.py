@@ -47,6 +47,7 @@ class DRT(eqx.Module):
         # time constants of device
         self.tau = tau
 
+        # Can't perform regression with this?
         # self.__validate__init__()
 
     def __repr__(self) -> str:
@@ -79,9 +80,9 @@ class DRT(eqx.Module):
         Validates the initial state of the DRT instance.
         """
         # Check for correct types
-        if not isinstance(self.R_inf, (int, float)):
+        if not isinstance(self.R_inf, (int, float, jnp.ndarray)):
             raise TypeError("R_inf must be a number")
-        if not isinstance(self.L_0, (int, float)):
+        if not isinstance(self.L_0, (int, float, jnp.ndarray)):
             raise TypeError("L_0 must be a number")
         if not isinstance(self.gamma, jnp.ndarray):
             raise TypeError("gamma must be a jnp.ndarray")
@@ -101,3 +102,11 @@ class DRT(eqx.Module):
         # Check for non-empty arrays
         if self.gamma.size == 0 or self.tau.size == 0:
             raise ValueError("gamma and tau must not be empty")
+
+        # Ensure all values in gamma are non-negative
+        if (self.gamma < 0).any():
+            raise ValueError("All values in gamma must be non-negative")
+
+        # Ensure all values in tau are positive
+        if (self.tau <= 0).any():
+            raise ValueError("All values in tau must be positive")

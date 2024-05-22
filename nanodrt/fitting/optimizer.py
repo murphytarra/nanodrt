@@ -77,7 +77,7 @@ class Optimizer(eqx.Module):
         """Validate the initialization parameters."""
         if not isinstance(self.measurement, ImpedenceMeasurement):
             raise TypeError(
-                f"Expected measurement to be an instance of Measurement, got {type(self.measurement)}"
+                f"Expected measurement to be an instance of ImpedenceMeasurement, got {type(self.measurement)}"
             )
         if not isinstance(self.drt, DRT):
             raise TypeError(
@@ -87,10 +87,28 @@ class Optimizer(eqx.Module):
             raise TypeError(f"Expected solver to be a string, got {type(self.solver)}")
         if self.solver not in ["regression"]:
             raise ValueError(f"Unsupported solver method: {self.solver}")
+        if not isinstance(self.integration_method, str):
+            raise TypeError(
+                f"Expected integration_method to be a string, got {type(self.integration_method)}"
+            )
+        if self.integration_method not in ["trapezoid", "rbf"]:
+            raise ValueError(
+                f"Unsupported integration method: {self.integration_method}"
+            )
         if self.solver_dict is not None and not isinstance(self.solver_dict, dict):
             raise TypeError(
                 f"Expected solver_dict to be a dictionary, got {type(self.solver_dict)}"
             )
+        if self.solver_dict is not None:
+            for key, value in self.solver_dict.items():
+                if not isinstance(key, str):
+                    raise TypeError(
+                        f"Keys in solver_dict must be strings, got {type(key)}"
+                    )
+                if not isinstance(value, (int, float)):
+                    raise TypeError(
+                        f"Values in solver_dict must be int or float, got {type(value)}"
+                    )
 
     @eqx.filter_jit()
     def run(

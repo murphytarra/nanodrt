@@ -80,10 +80,10 @@ class Simulation(eqx.Module):
             raise TypeError(
                 f"Expected integration_method to be a string, got {type(self.integration_method)}"
             )
-        # if self.integration_method != "trapezoid":
-        #     raise ValueError(
-        #         f"Unsupported integration method: {self.integration_method}"
-        # )
+        if self.integration_method not in ["trapezoid", "rbf"]:
+            raise ValueError(
+                f"Unsupported integration method: {self.integration_method}"
+            )
 
     @eqx.filter_jit
     def run(

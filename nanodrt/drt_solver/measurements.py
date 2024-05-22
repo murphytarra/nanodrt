@@ -97,3 +97,15 @@ class ImpedenceMeasurement(eqx.Module):
         # Check for non-empty arrays
         if self.Z_re.size == 0 or self.Z_im.size == 0 or self.f.size == 0:
             raise ValueError("Z_re, Z_im, and f must not be empty")
+
+        # Check for finite values in Z_re, Z_im, and f
+        if not jnp.isfinite(self.Z_re).all():
+            raise ValueError("Z_re must contain only finite values")
+        if not jnp.isfinite(self.Z_im).all():
+            raise ValueError("Z_im must contain only finite values")
+        if not jnp.isfinite(self.f).all():
+            raise ValueError("f must contain only finite values")
+
+        # Check for positive frequencies
+        if jnp.any(self.f <= 0):
+            raise ValueError("Frequencies must be positive")
