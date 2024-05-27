@@ -11,6 +11,7 @@ from nanodrt.drt_solver.measurements import ImpedenceMeasurement
 from nanodrt.fitting.fits import FittedSpectrum
 from nanodrt.drt_solver.simulaton import Simulation
 from nanodrt.drt_solver.solvers import RBFSolver
+from nanodrt.fitting.regularization import GCV
 
 
 class Regression(eqx.Module):
@@ -41,8 +42,24 @@ class Regression(eqx.Module):
             Simulation: Simulation Object containing the optimized parameters
         """
 
-        # Extract regularisation parameter
-        lbd = self.solver_dict["lambda"]
+        # Calculate A matrices and save as self.A_matrix
+        integrals = RBFSolver(
+            drt=self.drt, f_vec=self.measurement.f, log_t_vec=jnp.log(self.drt.tau)
+        )
+        A_matrices = integrals()
+
+        init_lbd = self.solver_dict["init_lbd"]
+        if self.solver_dict["lbd_selection"] == "GCV":
+            # get the GCV computed value
+            M = jnp.eye(A_matrices[0].shape[1] + 2)
+            gcv = GCV(
+                self.measurement,
+                A_matrices[0],
+                A_matrices[1],
+                M,
+                init_lbd,
+            )
+            init_lbd = jnp.exp(gcv())
 
         # Extract number of steps
         maxiter = self.solver_dict["maxiter"]
@@ -59,16 +76,10 @@ class Regression(eqx.Module):
                 init_params=init_params,
                 tau=self.drt.tau,
                 measurement=self.measurement,
-                lbd=lbd,
+                lbd=init_lbd,
             )
 
         if self.integration_method == "rbf":
-            # Calculate A matrices and save as self.A_matrix
-            integrals = RBFSolver(
-                drt=self.drt, f_vec=self.measurement.f, log_t_vec=jnp.log(self.drt.tau)
-            )
-            A_matrices = integrals()
-
             # define solver for new loss function
             solver = jaxopt.LBFGS(fun=self.loss_function_rbf, maxiter=maxiter)
 
@@ -76,7 +87,7 @@ class Regression(eqx.Module):
             res = solver.run(
                 init_params=init_params,
                 A_matrices=A_matrices,
-                lbd=lbd,
+                lbd=init_lbd,
             )
 
         # Extract parameters
