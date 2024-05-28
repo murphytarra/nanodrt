@@ -22,13 +22,16 @@ class Simulation(eqx.Module):
     drt: DRT
 
     # frequencies to simulate the DRT spectrum with
-    f_vec: jnp.ndarray  # type: ignore
+    f_vec: jnp.ndarray
 
     # Method of integration used to simulate DRT spectrum - at the moment this is either 'trapezoid' or 'rbf'
     integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
 
     # Logarithm of tau vector
-    log_t_vec: jnp.array = dataclasses.field(default=None)
+    log_t_vec: jnp.array = dataclasses.field(default=None)  # type: ignore
+
+    # RBF Function to use
+    rbf_function: jnp.array = dataclasses.field(default=None)  # type: ignore
 
     def __repr__(self) -> str:
         return (
@@ -105,7 +108,10 @@ class Simulation(eqx.Module):
 
         if self.integration_method == "rbf":
             integrals = RBFSolver(
-                drt=self.drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
+                drt=self.drt,
+                f_vec=self.f_vec,
+                log_t_vec=self.log_t_vec,
+                function=self.function,
             )
             integration = integrals()
             Z_re = self.drt.R_inf + integration[0] @ self.drt.gamma

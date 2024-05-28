@@ -7,7 +7,6 @@ from jax import config
 from jax import jit, vmap
 from quadax import trapezoid
 
-# Ask about typechecking again? Look up...
 from nanodrt.drt_solver.drt import DRT
 
 config.update("jax_enable_x64", True)
@@ -83,6 +82,8 @@ class RBFSolver(eqx.Module):
     # logarithm of time constants used for integral
     log_t_vec: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
 
+    rbf_function: str = dataclasses.field(default="guassian")  # type: ignore
+
     @eqx.filter_jit
     def __call__(self) -> jnp.ndarray:
 
@@ -110,6 +111,58 @@ class RBFSolver(eqx.Module):
         return jnp.exp(-((mu * (log_tau_m - self.log_t_vec)) ** 2))
 
     @eqx.filter_jit
+    def C2(self, log_tau_m: float, mu: float) -> float:
+        """
+        C2 Kernal used in RBF discretisation
+
+        Args:
+            log_tau_m (jnp.ndarray): time constant for RBF to be evaluated at
+            mu (float): constant used for guassian filter - determines FWHM
+
+        Returns:
+            float: RBF kernal value
+        """
+        x = log_tau_m - self.log_t_vec
+        return jnp.exp(-jnp.abs(mu * x)) * (1 + jnp.abs(mu * x))
+
+    @eqx.filter_jit
+    def C4(self, log_tau_m: float, mu: float) -> float:
+        """
+        C4 Kernal used in RBF discretisation
+
+        Args:
+            log_tau_m (jnp.ndarray): time constant for RBF to be evaluated at
+            mu (float): constant used for guassian filter - determines FWHM
+
+        Returns:
+            float: RBF kernal value
+        """
+        x = log_tau_m - self.log_t_vec
+        return jnp.exp(-jnp.abs(mu * x)) * (
+            1 + jnp.abs(mu * x) + (1.0 / 3.0) * jnp.abs(mu * x) ** 2
+        )
+
+    @eqx.filter_jit
+    def C6(self, log_tau_m: float, mu: float) -> float:
+        """
+        C6 Kernal used in RBF discretisation
+
+        Args:
+            log_tau_m (jnp.ndarray): time constant for RBF to be evaluated at
+            mu (float): constant used for guassian filter - determines FWHM
+
+        Returns:
+            float: RBF kernal value
+        """
+        x = log_tau_m - self.log_t_vec
+        return jnp.exp(-jnp.abs(mu * x)) * (
+            1
+            + jnp.abs(mu * x)
+            + (2.0 / 5.0) * jnp.abs(mu * x) ** 2
+            + (1.0 / 15.0) * jnp.abs(mu * x) ** 3
+        )
+
+    @eqx.filter_jit
     def A_element_re(self, f_m: float, log_tau_n: float) -> float:
         """
         Calculate the A matrix real component for the RBF method for a given frequency and time constant.
@@ -123,7 +176,16 @@ class RBFSolver(eqx.Module):
             float: Value of element of A matrix for specific frequency and time constant.
         """
 
-        phi = self.gaussian(log_tau_n, mu=5.0)  # size (n, )
+        # Checking which radial basis function to use
+        if self.rbf_function == "guassian":
+            phi = self.gaussian(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C2":
+            phi = self.C2(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C4":
+            phi = self.C4(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C6":
+            phi = self.C6(log_tau_n, mu=5.0)  # size (n, )
+
         factor = 1.0 / (
             1 + (2.0 * jnp.pi * jnp.exp(self.log_t_vec) * f_m) ** 2
         )  # size (n, )
@@ -144,7 +206,16 @@ class RBFSolver(eqx.Module):
             float: Value of element of A matrix for specific frequency and time constant.
         """
 
-        phi = self.gaussian(log_tau_n, mu=5.0)  # size (n, )
+        # Checking which radial basis function to use
+        if self.rbf_function == "guassian":
+            phi = self.gaussian(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C2":
+            phi = self.C2(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C4":
+            phi = self.C4(log_tau_n, mu=5.0)  # size (n, )
+        if self.rbf_function == "C6":
+            phi = self.C6(log_tau_n, mu=5.0)  # size (n, )
+
         factor = (
             2.0
             * jnp.pi

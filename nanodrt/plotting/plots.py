@@ -133,7 +133,7 @@ class Plot(eqx.Module):
 
             # Plotting the data
             axs[0].plot(
-                self.final_sim.log_t_vec,
+                (self.final_sim.log_t_vec),
                 (self.final_sim.gamma * phi).sum(axis=1),
                 "-o",
                 color="blue",

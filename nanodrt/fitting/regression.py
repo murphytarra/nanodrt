@@ -31,6 +31,8 @@ class Regression(eqx.Module):
     # Method of Integration used in Regression
     integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
 
+    rbf_function: str = dataclasses.field(default=None)  # type: ignore
+
     @eqx.filter_jit()
     def __call__(
         self,
@@ -44,7 +46,10 @@ class Regression(eqx.Module):
 
         # Calculate A matrices and save as self.A_matrix
         integrals = RBFSolver(
-            drt=self.drt, f_vec=self.measurement.f, log_t_vec=jnp.log(self.drt.tau)
+            drt=self.drt,
+            f_vec=self.measurement.f,
+            log_t_vec=jnp.log(self.drt.tau),
+            rbf_function=self.rbf_function,
         )
         A_matrices = integrals()
 
@@ -95,7 +100,12 @@ class Regression(eqx.Module):
 
         # Create fitted spectrum object
         fit = FittedSpectrum(
-            params, state, self.drt.tau, self.measurement.f, self.integration_method
+            params,
+            state,
+            self.drt.tau,
+            self.measurement.f,
+            self.integration_method,
+            self.rbf_function,
         )
 
         return fit

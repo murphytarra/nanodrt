@@ -30,12 +30,15 @@ class Optimizer(eqx.Module):
     # Dictionary of solvers used for fitting
     solver_dict: dict[str:float] = dataclasses.field(default=None)  #  type: ignore
 
+    rbf_function: str = dataclasses.field(default=None)  #  type: ignore
+
     def __init__(
         self,
         measurement: ImpedenceMeasurement,
         drt: DRT,
         solver: str = "regression",
         integration_method: str = "trapezoid",
+        rbf_function: str = None,
         solver_dict: dict[str, float] = None,
     ) -> None:
         """
@@ -64,6 +67,8 @@ class Optimizer(eqx.Module):
 
         # Hyperparameters for the solving method
         self.solver_dict = solver_dict
+
+        self.rbf_function = rbf_function
 
         self.__validate_init__()
 
@@ -109,6 +114,7 @@ class Optimizer(eqx.Module):
                 drt=self.drt,
                 solver_dict=self.solver_dict,
                 integration_method=self.integration_method,
+                rbf_function=self.rbf_function,
             )
             fit = regression()
             return fit

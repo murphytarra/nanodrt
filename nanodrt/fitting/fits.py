@@ -44,6 +44,8 @@ class FittedSpectrum(eqx.Module):
     # Integration method used
     integration_method: str = dataclasses.field(default=None)  # type: ignore
 
+    rbf_function: str = dataclasses.field(default=None)  # type: ignore
+
     def __init__(
         self,
         params: jnp.ndarray,
@@ -51,6 +53,7 @@ class FittedSpectrum(eqx.Module):
         tau: jnp.ndarray,
         f_vec: jnp.ndarray,
         integration_method: str,
+        rbf_function: str,
     ) -> None:
         """Dataclass for the fitted spectrum obtained in optimisation process
 
@@ -84,6 +87,9 @@ class FittedSpectrum(eqx.Module):
         # Type of integration method used in optimisation process
         self.integration_method = integration_method
 
+        # rbf_function used throughout simulation
+        self.rbf_function = rbf_function
+
     def __repr__(self) -> str:
         return (
             f"FittedSpectrum(params={self.params}, state={self.state}, tau={self.tau}, "
@@ -107,7 +113,12 @@ class FittedSpectrum(eqx.Module):
             Z_im = 2 * jnp.pi * self.f_vec * self.L_0 + integration[1]
 
         if self.integration_method == "rbf":
-            integrals = RBFSolver(drt=drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec)
+            integrals = RBFSolver(
+                drt=drt,
+                f_vec=self.f_vec,
+                log_t_vec=self.log_t_vec,
+                rbf_function=self.rbf_function,
+            )
             integration = integrals()
             Z_re = self.R_inf + integration[0] @ self.gamma
             Z_im = 2 * jnp.pi * self.f_vec * self.L_0 + integration[1] @ self.gamma
