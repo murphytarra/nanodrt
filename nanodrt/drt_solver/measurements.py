@@ -25,25 +25,23 @@ class ImpedenceMeasurement(eqx.Module):
     tau: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
 
     # define init
-    def __init__(self, Z_re=jnp.ndarray, Z_im=jnp.ndarray, f=jnp.ndarray) -> None:
+    def __init__(self, Z_re, Z_im, f) -> None:
         """
         Class defining the battery measurement
 
         Args:
-            Z_re (jnp.ndarray): Array containing the real part of impedance. Defaults to jnp.ndarray.
-            Z_im (jnp.ndarray):  Array containing the imaginary part of impedance. Defaults to jnp.ndarray.
-            f (jnp.ndarray): Frequencies corresponding to the impedance. Defaults to jnp.ndarray.
+            Z_re (array-like): Array containing the real part of impedance.
+            Z_im (array-like): Array containing the imaginary part of impedance.
+            f (array-like): Frequencies corresponding to the impedance.
         """
 
-        # Impedences in Ohms
-        self.Z_re = Z_re
-        self.Z_im = Z_im
-
-        # frequencies in hertz
-        self.f = f
+        # Convert to jnp.ndarray if not already
+        self.Z_re = jnp.asarray(Z_re) if not isinstance(Z_re, jnp.ndarray) else Z_re
+        self.Z_im = jnp.asarray(Z_im) if not isinstance(Z_im, jnp.ndarray) else Z_im
+        self.f = jnp.asarray(f) if not isinstance(f, jnp.ndarray) else f
 
         # corresponding time constants in seconds
-        self.tau = 1.0 / (2 * jnp.pi * f)
+        self.tau = 1.0 / (2 * jnp.pi * self.f)
 
         self.__validate_init__()
 

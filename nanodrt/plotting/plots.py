@@ -133,7 +133,7 @@ class Plot(eqx.Module):
 
             # Plotting the data
             axs[0].plot(
-                (self.final_sim.log_t_vec),
+                jnp.exp(self.final_sim.log_t_vec),
                 (self.final_sim.gamma * phi).sum(axis=1),
                 "-o",
                 color="blue",
@@ -143,7 +143,7 @@ class Plot(eqx.Module):
         elif self.final_sim.integration_method == "trapezoid":
             # Plotting the data
             axs[0].plot(
-                self.final_sim.log_t_vec,
+                jnp.exp(self.final_sim.log_t_vec),
                 self.final_sim.gamma,
                 "-o",
                 color="blue",
@@ -154,6 +154,9 @@ class Plot(eqx.Module):
         axs[0].set_xlabel(r"$\log(\tau)$", fontsize=16)
         axs[0].set_ylabel(r"$\gamma(\log(\tau))$", fontsize=16)
         axs[0].set_title("DRT Spectrum", fontsize=20)
+
+        # Set x-axis to logarithmic scale
+        axs[0].set_xscale("log")
 
         # Plot DRT on the second subplot
         Z_fit_re, Z_fit_im = self.final_sim.simulate()

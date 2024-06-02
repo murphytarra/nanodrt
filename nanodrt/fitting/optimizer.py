@@ -9,6 +9,15 @@ from nanodrt.fitting.regression import Regression
 from nanodrt.drt_solver.drt import DRT
 from nanodrt.drt_solver.measurements import ImpedenceMeasurement
 
+import json
+
+# logging.basicConfig(
+#     level=logging.INFO,
+#     filename="info.log",
+#     filemode="w",
+#     format="%(asctime)s - %(levelname)s - %(message)s",
+# )  # base the name off the time
+
 
 class Optimizer(eqx.Module):
     """
@@ -117,4 +126,5 @@ class Optimizer(eqx.Module):
                 rbf_function=self.rbf_function,
             )
             fit = regression()
+
             return fit
