@@ -1,6 +1,6 @@
 # NanoDRT: Fitting Library for EIS DRT Spectroscopy
 
-NanoDRT is a small python package written in JAX to determine the DRT of EIS Spectroscopy Data. 
+NanoDRT is a python package written in JAX to determine the DRT Spectrum of EIS Spectroscopy Data. 
 
 ## Installation 
 
@@ -25,29 +25,34 @@ Let's first provide a quick example to how we can use NanoDRT to fit to EIS data
 import jax.numpy as jnp 
 import pandas as pd 
 
-# How to make this all one import?
+# How to make this all one import? Tara to do :) 
 from nanodrt.drt_solver.drt import DRT 
 from nanodrt.fitting.optimizer import Optimizer 
-from nanodrt.drt_solver.measurements import ImpedenceMeasurement 
+from nanodrt.drt_solver.measurements import ImpedenceMeasurement
+from nanodrt.plotting.plots import Plot 
 from nanodrt.drt_solver.utils import (ZARC, 
                                  gamma_ZARC) 
+                        
 
-columns = ["f", "Z_re", "Z_im"]
-df = pd.read_csv("data/single_ZARC.csv", header=None, names=columns)
+# Read data 
+df = pd.read_csv("data/single_ZARC.csv")
 
-f = df["f"]
-tau = 1./(2*jnp.pi*f)
+# Determine time constants
+tau = 1.0/(2.0*jnp.pi* df["f"])
 
+# Create Measurmenet Object 
 measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
 
 #Create our DRT guess
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
 drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
 
-# Fit 
+# Fit to data
 solver_dict = {"init_lbd": 0.05, "lbd_selection": "GCV", 'maxiter': 5e3}
 optim = Optimizer(drt=drt, measurement=measurement, solver="regression", integration_method="rbf", solver_dict = solver_dict, rbf_function="guassian")
 final_sim = optim.run()
+
+# Simulate final fitting 
 Z_re_fitted, Z_im_fitted = final_sim.simulate()
 ```
 
@@ -71,9 +76,9 @@ The impedance $ Z(f)$ as a function of frequency $ f $ can be expressed using th
 $$Z(f) = i2\pi f L_0 + R_{\infty} + \int_{-\infty}^{\infty} \frac{g(\log \tau)}{1 + i2\pi f \tau} \, d\log \tau $$
 
 Where:
-- \( L_0 \) is the inductance.
-- \( R_{\infty} \) is the high-frequency resistance.
-- \( \tau \) is the relaxation time.
+- $L_0$ is the inductance.
+- $R_{\infty}$ is the high-frequency resistance.
+- $\tau$ is the relaxation time.
 
 ### Real and Imaginary Parts of Impedance
 
@@ -93,9 +98,35 @@ By applying DRT to EIS data, researchers can:
 - Quantify the contribution of different mechanisms.
 - Improve the interpretation and modeling of electrochemical systems.
 
+## Regularisation Methods 
+
+
+Regularisation is essential in fitting DRT spectra to EIS data to prevent overfitting and to handle the ill-posed nature of the inverse problem. In NanoDRT, we use a regularisation term added to the loss function to achieve this. The general form of the regularised loss function is:
+
+$$\text{Loss} = \sum_{i=1}^{N} \left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simulated}}(f_i) \right)^2 + \left( Z''_{\text{measured}}(f_i) - Z''_{\text{simulated}}(f_i) \right)^2 \right) $$
+$$+ \lambda \cdot \text{Regularisation Term} $$
+
+Where:
+- $\lambda$ is the regularisation parameter.
+- $ Z'_{\text{measured}} $ and $ Z''_{\text{measured}}$ are the real and imaginary parts of the measured impedance.
+- $ Z'_{\text{simulated}} $ and $ Z''_{\text{simulated}} $ are the real and imaginary parts of the simulated impedance.
+
+### Types of Regularisation
+The common types of regularisation implemented in NanoDRT include:
+
+1. **Tikhonov Regularisation (L2 Regularisation)**:
+   This adds a penalty on the squared magnitude of the DRT, encouraging smoother solutions.
+
+   $ \text{Regularisation Term} = \| \gamma \|_2^2 $
+
+<!-- 2. **L1 Regularisation**:
+   This adds a penalty on the absolute magnitude of the DRT, promoting sparsity.
+
+   $ \text{Regularisation Term} = \| \gamma \|_1 $ -->
+
 ## Methods of Integration Available
 
-When fitting to EIS data - several numerical methods of integration are available to the user. 
+When fitting to EIS data - one needs to numerically calculate an integral. In NanoDRT, several numerical methods of integration are available to the user. 
 
 The simpliest example is using `trapezoidal`, which uses the trapezoidal method to determine the integral for the DRT calculation. 
 
@@ -110,9 +141,9 @@ However, as seen in CITE, different methods of calculating this integral have pr
 | RBF Function | Formula                             |
 |--------------|-------------------------------------|
 | Gaussian     | $\phi(r) = e^{-(\epsilon r)^2}$ |
-| C2           | $ \phi(r) = (1 + \epsilon r) e^{-\epsilon r} $ |
-| C4           | $ \phi(r) = (1 + \epsilon r + (\epsilon r)^2 / 2) e^{-\epsilon r} $ |
-| C6           | $ \phi(r) = (1 + \epsilon r + (\epsilon r)^2 / 2 + (\epsilon r)^3 / 6) e^{-\epsilon r} $ |
+| C2           | $\phi(r) = (1 + \epsilon r) e^{-\epsilon r}$ |
+| C4           | $\phi(r) = (1 + \epsilon r + (\epsilon r)^2 / 2) e^{-\epsilon r}$ |
+| C6           | $\phi(r) = (1 + \epsilon r + (\epsilon r)^2 / 2 + (\epsilon r)^3 / 6) e^{-\epsilon r}$ |
 
 Where:
 - $ r $ is the radial distance.
@@ -151,4 +182,47 @@ Note: the value of the regularisation parameter chosen will greatly effect your 
 
 ### Double Zarc Model 
 
+Below we give an example that fits the DRT Spectrum to the Double ZARC Model. 
+
+```
+df = pd.read_csv("data/double_ZARC.csv")
+tau = 1.0/(2.0*jnp.pi*df["f"])
+
+measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
+
+drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
+
+solver_dict = {'init_lbd': -3., 'lbd_selection': "GCV", 'maxiter': 5e3}
+
+optim = Optimizer(drt=drt, measurement=measurement, solver="regression", rbf_function="guassian", integration_method="trapezoid", solver_dict = solver_dict)
+
+final_sim = optim.run()
+
+Z_re_fitted, Z_im_fitted = final_sim.simulate()
+
+plot = Plot(final_sim, measurement)
+plot.show()
+```
+
 ### Ed's Weird Data
+
+```
+df = pd.read_csv("data/double_ZARC.csv")
+tau = jnp.flip(jnp.logspace(-8, 4, 100))
+measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
+
+gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
+
+drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
+
+solver_dict = {'init_lbd': -4., 'lbd_selection': "GCV", 'maxiter': 5e6}
+
+optim = Optimizer(drt=drt, measurement=measurement, solver="regression", integration_method="rbf",rbf_function="guassian", solver_dict = solver_dict, )
+
+final_sim = optim.run()
+
+Z_re_fitted, Z_im_fitted = final_sim.simulate()
+
+plot = Plot(final_sim, measurement)
+plot.show()
+```
