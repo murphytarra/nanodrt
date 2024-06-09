@@ -11,7 +11,7 @@ This will create a conda environment with the NanoDRT installed. To use NanoDRT,
 ```
 conda create -n nanodrt python=3.8 -y 
 conda activate nanodrt
-git clone git@github.com:murphytarra/nanodrt.git
+git clone https://github.com/murphytarra/nanodrt.git
 pip install -e nanodrt
 ```
 
@@ -38,10 +38,10 @@ from nanodrt.drt_solver.utils import (ZARC,
 df = pd.read_csv("data/single_ZARC.csv")
 
 # Determine time constants
-tau = 1.0/(2.0*jnp.pi* df["f"])
+tau = 1.0/(2.0*jnp.pi* df["f"].values)
 
 # Create Measurmenet Object 
-measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
+measurement = ImpedenceMeasurement(df["Z_re"]df["f"].values, df["Z_im"]df["f"].values, df["f"]df["f"].values)
 
 #Create our DRT guess
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
@@ -103,13 +103,13 @@ By applying DRT to EIS data, researchers can:
 
 Regularisation is essential in fitting DRT spectra to EIS data to prevent overfitting and to handle the ill-posed nature of the inverse problem. In NanoDRT, we use a regularisation term added to the loss function to achieve this. The general form of the regularised loss function is:
 
-$$\text{Loss} = \sum_{i=1}^{N} \left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simulated}}(f_i) \right)^2 + \left( Z''_{\text{measured}}(f_i) - Z''_{\text{simulated}}(f_i) \right)^2 \right) $$
-$$+ \lambda \cdot \text{Regularisation Term} $$
+$$\text{Loss} = \sum_{i=1}^{N} \left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simulated}}(f_i) \right)^2 + \left( Z''_{\text{measured}}(f_i) - Z''_{\text{simulated}}(f_i) \right)^2 \right)$$
+$$+ \lambda \cdot \text{Regularisation Term}$$
 
 Where:
 - $\lambda$ is the regularisation parameter.
-- $ Z'_{\text{measured}} $ and $ Z''_{\text{measured}}$ are the real and imaginary parts of the measured impedance.
-- $ Z'_{\text{simulated}} $ and $ Z''_{\text{simulated}} $ are the real and imaginary parts of the simulated impedance.
+- $Z'_{\text{measured}}$ and $Z''_{\text{measured}}$ are the real and imaginary parts of the measured impedance.
+- $Z'_{\text{simulated}}$ and $Z''_{\text{simulated}}$ are the real and imaginary parts of the simulated impedance.
 
 ### Types of Regularisation
 The common types of regularisation implemented in NanoDRT include:
@@ -226,3 +226,8 @@ Z_re_fitted, Z_im_fitted = final_sim.simulate()
 plot = Plot(final_sim, measurement)
 plot.show()
 ```
+
+## To Do: 
+- Add logging aspect 
+- more documentation 
+- Bayesian approach next?
