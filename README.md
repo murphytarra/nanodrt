@@ -107,9 +107,9 @@ $`\text{Loss} = \sum_{i}\left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simu
 $`+ \lambda \cdot \text{Regularisation Term}`$
 
 Where:
-- $\lambda$ is the regularisation parameter.
-- $Z'_{\text{measured}}$ and $Z''_{\text{measured}}$ are the real and imaginary parts of the measured impedance.
-- $Z'_{\text{simulated}}$ and $Z''_{\text{simulated}}$ are the real and imaginary parts of the simulated impedance.
+- $`\lambda`$ is the regularisation parameter.
+- $`Z'_{\text{measured}}`$ and $`Z''_{\text{measured}}`$ are the real and imaginary parts of the measured impedance.
+- $`Z'_{\text{simulated}}`$ and $`Z''_{\text{simulated}}`$ are the real and imaginary parts of the simulated impedance.
 
 ### Types of Regularisation
 The common types of regularisation implemented in NanoDRT include:
