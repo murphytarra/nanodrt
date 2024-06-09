@@ -82,7 +82,7 @@ Where:
 
 ### Real and Imaginary Parts of Impedance
 
-The real part $ Z' $ and imaginary part $Z'' $ of the impedance are given by:
+The real part $`Z'`$ and imaginary part $`Z''`$ of the impedance are given by:
 
 $$Z'(f) = R_{\infty} + \int_{-\infty}^{\infty} \frac{g(\log \tau)}{1 + (2\pi f \tau)^2} \, d\log \tau $$
 
@@ -231,3 +231,4 @@ plot.show()
 - Add logging aspect 
 - more documentation 
 - Bayesian approach next?
+- Fix markdown in readme?
