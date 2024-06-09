@@ -10,7 +10,7 @@ This will create a conda environment with the NanoDRT installed. To use NanoDRT,
 
 ```
 conda create -n nanodrt python=3.8 -y 
-conda activate myenv 
+conda activate nanodrt
 git clone git@github.com:murphytarra/nanodrt.git
 pip install -e nanodrt
 ```
