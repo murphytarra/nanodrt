@@ -231,4 +231,4 @@ plot.show()
 - Add logging aspect 
 - more documentation 
 - Bayesian approach next?
-- Fix markdown in readme?
+- Add in ref in markdown and extra links
