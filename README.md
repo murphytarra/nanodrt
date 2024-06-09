@@ -117,7 +117,7 @@ The common types of regularisation implemented in NanoDRT include:
 1. **Tikhonov Regularisation (L2 Regularisation)**:
    This adds a penalty on the squared magnitude of the DRT, encouraging smoother solutions.
 
-   $ \text{Regularisation Term} = \| \gamma \|_2^2 $
+   $`\text{Regularisation Term} = \| \gamma \|_2^2`$
 
 <!-- 2. **L1 Regularisation**:
    This adds a penalty on the absolute magnitude of the DRT, promoting sparsity.
