@@ -103,8 +103,8 @@ By applying DRT to EIS data, researchers can:
 
 Regularisation is essential in fitting DRT spectra to EIS data to prevent overfitting and to handle the ill-posed nature of the inverse problem. In NanoDRT, we use a regularisation term added to the loss function to achieve this. The general form of the regularised loss function is:
 
-$$``\text{Loss} = \sum_{i=1}^{N} \left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simulated}}(f_i) \right)^2 + \left( Z''_{\text{measured}}(f_i) - Z''_{\text{simulated}}(f_i) \right)^2 \right)``$$
-$$+ \lambda \cdot \text{Regularisation Term}$$
+$`\text{Loss} = \sum_{i=1}^{N} \left( \left( Z'_{\text{measured}}(f_i) - Z'_{\text{simulated}}(f_i) \right)^2 + \left( Z''_{\text{measured}}(f_i) - Z''_{\text{simulated}}(f_i) \right)^2 \right)`$
+$`+ \lambda \cdot \text{Regularisation Term}`$
 
 Where:
 - $\lambda$ is the regularisation parameter.
