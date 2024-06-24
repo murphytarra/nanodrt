@@ -44,8 +44,8 @@ class Regression(eqx.Module):
             Simulation: Simulation Object containing the optimized parameters
         """
 
-        # Calculate A matrices and save as self.A_matrix
-        integrals = RBFSolver(
+        # Calculate A matrices and save as self.A_matrix                          # I guess is not needed if trapezoid chosen? will be default rbf which is gaussian otherwise if set as none presumably some error thrown by rbf solver
+        integrals = RBFSolver(    
             drt=self.drt,
             f_vec=self.measurement.f,
             log_t_vec=jnp.log(self.drt.tau),
@@ -53,7 +53,7 @@ class Regression(eqx.Module):
         )
         A_matrices = integrals()
 
-        init_lbd = self.solver_dict["init_lbd"]
+        init_lbd = self.solver_dict["init_lbd"]                                  # how does this work if trapezoidal chosen?
         if self.solver_dict["lbd_selection"] == "GCV":
             # get the GCV computed value
             M = jnp.eye(A_matrices[0].shape[1] + 2)

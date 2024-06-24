@@ -92,10 +92,10 @@ class Simulation(eqx.Module):
     def run(
         self,
     ):
-        """Function which selects and runs the solver to determine the impedence
+        """Function which selects and runs the solver to determine the impedance
 
         Returns:
-            jnp.ndarray: Real and Imaginary impedence values
+            jnp.ndarray: Real and Imaginary impedance values
         """
 
         if self.integration_method == "trapezoid":
