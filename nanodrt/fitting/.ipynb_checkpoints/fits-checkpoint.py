@@ -44,7 +44,11 @@ class FittedSpectrum(eqx.Module):
     # Integration method used
     integration_method: str = dataclasses.field(default=None)  # type: ignore
 
+    # Radial basis function used (if applicable)
     rbf_function: str = dataclasses.field(default=None)  # type: ignore
+    
+    # DRT object used in impedance simulation
+    drt: DRT = dataclasses.field(default=None) # type: ignore
 
     def __init__(
         self,
@@ -89,6 +93,8 @@ class FittedSpectrum(eqx.Module):
 
         # rbf_function used throughout simulation
         self.rbf_function = rbf_function
+        
+        self.drt = DRT(self.R_inf, self.L_0, self.gamma, self.tau)
 
     def __repr__(self) -> str:
         return (
@@ -102,11 +108,11 @@ class FittedSpectrum(eqx.Module):
         Returns:
             jnp.ndarray: Real and Imaginary impedences.
         """
-        drt = DRT(self.R_inf, self.L_0, self.gamma, self.tau)
+        
 
         if self.integration_method == "trapezoid":
             integrals = TrapezoidalSolver(
-                drt=drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
+                drt=self.drt, f_vec=self.f_vec, log_t_vec=self.log_t_vec
             )
             integration = integrals()
             Z_re = self.R_inf + integration[0]
@@ -114,7 +120,7 @@ class FittedSpectrum(eqx.Module):
 
         if self.integration_method == "rbf":
             integrals = RBFSolver(
-                drt=drt,
+                drt=self.drt,
                 f_vec=self.f_vec,
                 log_t_vec=self.log_t_vec,
                 rbf_function=self.rbf_function,
