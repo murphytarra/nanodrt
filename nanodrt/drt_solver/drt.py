@@ -11,7 +11,7 @@ config.update("jax_enable_x64", True)
 
 class DRT(eqx.Module):
     """
-    Class defining the DRT spectrum of the battery
+    Class defining the DRT spectrum of the battery. Pretty much just a convenient data class rather than used directly for calculation. 
     """
 
     # Resistance and Inductance of a battery device

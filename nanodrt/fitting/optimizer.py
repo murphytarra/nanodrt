@@ -27,27 +27,27 @@ class Optimizer(eqx.Module):
     # Measurment object containing experimental data
     measurement: ImpedenceMeasurement
 
-    # DRT containing intitial guess for parameters and spectrum to be fitted
+    # DRT containing intitial guess for parameters and DRT spectrum to be fitted
     drt: DRT
 
     # solver used to fit the data
     solver: str = dataclasses.field(default="regression")  # type: ignore
 
     # Integration Method used in the simulation
-    integration_method: str = dataclasses.field(default="trapezoid")  # type: ignore
+    integration_method: str = dataclasses.field(default="rbf")  # type: ignore
 
     # Dictionary of solvers used for fitting
     solver_dict: dict[str:float] = dataclasses.field(default=None)  #  type: ignore
 
-    rbf_function: str = dataclasses.field(default=None)  #  type: ignore
+    rbf_function: str = dataclasses.field(default="gaussian")  #  type: ignore
 
     def __init__(
         self,
         measurement: ImpedenceMeasurement,
         drt: DRT,
         solver: str = "regression",
-        integration_method: str = "trapezoid",
-        rbf_function: str = None,
+        integration_method: str = "rbf",
+        rbf_function: str = "gaussian",
         solver_dict: dict[str, float] = None,
     ) -> None:
         """
@@ -65,7 +65,7 @@ class Optimizer(eqx.Module):
         # Measurement object
         self.measurement = measurement
 
-        # DRT object to be measured
+        # DRT object for initial parameters
         self.drt = drt
 
         # Type of solver used
@@ -77,7 +77,7 @@ class Optimizer(eqx.Module):
         # Hyperparameters for the solving method
         self.solver_dict = solver_dict
 
-        self.rbf_function = rbf_function
+        self.rbf_function = rbf_function.lower()
 
         self.__validate_init__()
 
@@ -125,6 +125,6 @@ class Optimizer(eqx.Module):
                 integration_method=self.integration_method,
                 rbf_function=self.rbf_function,
             )
-            fit = regression()
+            fit = regression.fit()
 
             return fit
