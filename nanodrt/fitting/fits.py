@@ -6,9 +6,9 @@ import dataclasses
 import jax.numpy as jnp
 from jax import config
 
-from nanodrt2.drt_solver.solvers import RBFSolver
+from nanodrt.drt_solver.solvers import RBFSolver
 
-from nanodrt2.drt_solver.drt import DRT
+from nanodrt.drt_solver.drt import DRT
 
 config.update("jax_enable_x64", True)
 

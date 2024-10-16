@@ -7,7 +7,7 @@ from jax import config
 from jax import jit, vmap
 from quadax import trapezoid
 
-from nanodrt2.drt_solver.drt import DRT
+from nanodrt.drt_solver.drt import DRT
 
 config.update("jax_enable_x64", True)
 

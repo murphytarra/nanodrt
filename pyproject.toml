@@ -3,7 +3,7 @@ requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
-name = "nanodrt2"
+name = "nanodrt"
 version = "0.0.0"
 description = "A Fitting Library for EIS DRT Spectroscopy" 
 authors = ["Tara Murphy <tm763@cam.ac.uk>", "Edward Saunders , <es758@cam.ac.uk>"]  

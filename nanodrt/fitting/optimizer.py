@@ -2,11 +2,11 @@
 import equinox as eqx
 import dataclasses
 import jax.numpy as jnp
-from nanodrt2.fitting.regression import Regression
+from nanodrt.fitting.regression import Regression
 
 # Ask about typechecking again? Look up...
-from nanodrt2.drt_solver.drt import DRT
-from nanodrt2.drt_solver.measurements import ImpedanceMeasurement
+from nanodrt.drt_solver.drt import DRT
+from nanodrt.drt_solver.measurements import ImpedanceMeasurement
 
 import json
 

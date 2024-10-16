@@ -2,8 +2,8 @@
 
 import equinox as eqx
 import jax.numpy as jnp
-from nanodrt2.fitting.fits import FittedSpectrum
-from nanodrt2.drt_solver.measurements import ImpedanceMeasurement
+from nanodrt.fitting.fits import FittedSpectrum
+from nanodrt.drt_solver.measurements import ImpedanceMeasurement
 import dataclasses
 import seaborn as sns
 from jax import vmap
