@@ -107,6 +107,6 @@ class Simulation(eqx.Module):
                 log_t_vec=self.log_t_vec,
             )
             integration = integrals()
-            Z_re = self.drt.R_inf + integration[0] @ self.drt.x
+            Z_re = self.drt.R_0 + integration[0] @ self.drt.x
             Z_im = 2 * jnp.pi * self.f_vec * self.drt.L_0 + integration[1] @ self.drt.x
         return Z_re, Z_im

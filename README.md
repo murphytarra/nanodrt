@@ -45,7 +45,7 @@ measurement = ImpedanceMeasurement(df["Z_re"]df["f"].values, df["Z_im"]df["f"].v
 
 #Create our DRT guess
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
-drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
+drt = DRT(R_0= 10, L_0=0, gamma=gamma_guess, tau=tau)
 
 # Fit to data
 solver_dict = {"init_lbd": 0.05, "lbd_selection": "GCV", 'maxiter': 5e3}
@@ -190,7 +190,7 @@ tau = 1.0/(2.0*jnp.pi*df["f"])
 
 measurement = ImpedanceMeasurement(df["Z_re"], df["Z_im"], df["f"])
 
-drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
+drt = DRT(R_0= 10, L_0=0, gamma=gamma_guess, tau=tau)
 
 solver_dict = {'init_lbd': -3., 'lbd_selection': "GCV", 'maxiter': 5e3}
 
@@ -213,7 +213,7 @@ measurement = ImpedanceMeasurement(df["Z_re"], df["Z_im"], df["f"])
 
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
 
-drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
+drt = DRT(R_0= 10, L_0=0, gamma=gamma_guess, tau=tau)
 
 solver_dict = {'init_lbd': -4., 'lbd_selection': "GCV", 'maxiter': 5e6}
 

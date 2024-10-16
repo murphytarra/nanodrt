@@ -56,7 +56,7 @@ class Regression(eqx.Module):
         maxiter = self.solver_dict["maxiter"]
 
         # Initial Parameters to be fitted in optimization process
-        init_params = jnp.hstack((self.drt.R_inf, self.drt.L_0, self.drt.x))
+        init_params = jnp.hstack((self.drt.R_0, self.drt.L_0, self.drt.x))
 
         if self.integration_method == "rbf":
             # define solver for new loss function
@@ -102,14 +102,13 @@ class Regression(eqx.Module):
             float: Return residuals of loss function calculated.
         """
         # Extract parameters
-        R_inf = init_params[0]
-        L_0 = init_params[1]
-
         # Here we take the absolute value to ensure non negativity
+        R_0 = jnp.abs(init_params[0])
+        L_0 = jnp.abs(init_params[1])
         x = jnp.abs(init_params[2:])
 
         # Calculate the real and imaginary part of the Impedance
-        Z_re = R_inf + A_matrices[0] @ x
+        Z_re = R_0 + A_matrices[0] @ x
         Z_im = 2 * jnp.pi * self.measurement.f * L_0 + A_matrices[1] @ x
 
         # calculate residuals

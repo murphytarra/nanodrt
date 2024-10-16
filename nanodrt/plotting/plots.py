@@ -44,8 +44,7 @@ class Plot(eqx.Module):
         if self.final_sim.integration_method == "rbf":
             phi = vmap(self.gaussian, in_axes=(0, None, None))(
                 self.final_sim.log_t_vec, self.final_sim.log_t_vec, self.final_sim.mu
-            )  # size (n, )
-
+            ) 
             # Plotting the data
             ax.plot(
                 self.final_sim.log_t_vec,

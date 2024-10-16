@@ -1,13 +1,13 @@
 import jax.numpy as jnp
 
 
-def ZARC(f, R_inf, R_ct, tau_0, phi):
+def ZARC(f, R_0, R_ct, tau_0, phi):
     """
     Calculate the impedance based on the given parameters.
 
     Args:
     f (float or array-like): Frequency of the input signal (in Hz).
-    R_inf (float): Infinite frequency resistance (ohmic resistance).
+    R_0 (float): Infinite frequency resistance (ohmic resistance).
     R_ct (float): Charge-transfer resistance.
     tau_0 (float): Characteristic time constant.
     phi (float): Dispersion coefficient, related to the roughness of the impedance response.
@@ -19,7 +19,7 @@ def ZARC(f, R_inf, R_ct, tau_0, phi):
     # Calculate the complex part of the impedance
     omega_tau = 2 * jnp.pi * f * tau_0
     exponent = 1j * omega_tau
-    Z = R_inf + R_ct / (1 + exponent**phi)
+    Z = R_0 + R_ct / (1 + exponent**phi)
 
     return Z
 

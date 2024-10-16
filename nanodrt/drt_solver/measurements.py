@@ -21,9 +21,6 @@ class ImpedanceMeasurement(eqx.Module):
     # Frequencies corresponding to Impedance Arrays
     f: jnp.ndarray
 
-    # time constant array used for simulations
-    tau: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
-
     # define init
     def __init__(self, Z_re, Z_im, f) -> None:
         """
@@ -39,9 +36,6 @@ class ImpedanceMeasurement(eqx.Module):
         self.Z_re = jnp.asarray(Z_re) if not isinstance(Z_re, jnp.ndarray) else Z_re
         self.Z_im = jnp.asarray(Z_im) if not isinstance(Z_im, jnp.ndarray) else Z_im
         self.f = jnp.asarray(f) if not isinstance(f, jnp.ndarray) else f
-
-        # corresponding time constants in seconds
-        self.tau = 1.0 / (2 * jnp.pi * self.f)
 
         self.__validate_init__()
 

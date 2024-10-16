@@ -34,7 +34,7 @@ class FittedSpectrum(eqx.Module):
     f_vec: jnp.ndarray
 
     # Label parameters that have been fitted
-    R_inf: float = dataclasses.field(default=None)  # type: ignore
+    R_0: float = dataclasses.field(default=None)  # type: ignore
     L_0: float = dataclasses.field(default=None)  # type: ignore
     x: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
 
@@ -79,8 +79,8 @@ class FittedSpectrum(eqx.Module):
         self.value = self.state.value
 
         # Extract optimised values
-        self.R_inf = self.params[0]
-        self.L_0 = self.params[1]
+        self.R_0 = jnp.abs(self.params[0])
+        self.L_0 = jnp.abs(self.params[1])
         self.x = jnp.abs(self.params[2:])
 
         # Frequencies used in optimisation process
@@ -96,7 +96,7 @@ class FittedSpectrum(eqx.Module):
     def __repr__(self) -> str:
         return (
             f"FittedSpectrum(params={self.params}, state={self.state}, tau={self.tau}, "
-            f"R_inf={self.R_inf}, L_0={self.L_0}, value={self.value})"
+            f"R_0={self.R_0}, L_0={self.L_0}, value={self.value})"
         )
 
     def simulate(self) -> jnp.ndarray:
@@ -105,7 +105,7 @@ class FittedSpectrum(eqx.Module):
         Returns:
             jnp.ndarray: Real and Imaginary Impedances.
         """
-        drt = DRT(self.R_inf, self.L_0, self.x, self.tau)
+        drt = DRT(self.R_0, self.L_0, self.x, self.tau)
 
         if self.integration_method == "rbf":
             integrals = RBFSolver(
@@ -114,6 +114,6 @@ class FittedSpectrum(eqx.Module):
                 log_t_vec=self.log_t_vec,
             )
             integration = integrals()
-            Z_re = self.R_inf + integration[0] @ self.x
+            Z_re = self.R_0 + integration[0] @ self.x
             Z_im = 2 * jnp.pi * self.f_vec * self.L_0 + integration[1] @ self.x
         return Z_re, Z_im
