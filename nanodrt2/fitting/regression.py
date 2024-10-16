@@ -6,9 +6,9 @@ import dataclasses
 
 # Ask about typechecking again? Look up...
 from nanodrt2.drt_solver.drt import DRT
-from nanodrt2.drt_solver.measurements import ImpedenceMeasurement
+from nanodrt2.drt_solver.measurements import ImpedanceMeasurement
 from nanodrt2.fitting.fits import FittedSpectrum
-from nanodrt2.drt_solver.simulaton import Simulation
+from nanodrt2.drt_solver.simulation import Simulation
 from nanodrt2.drt_solver.solvers import RBFSolver
 
 
@@ -18,7 +18,7 @@ class Regression(eqx.Module):
     """
 
     # Measurement object containing experimental data
-    measurement: ImpedenceMeasurement
+    measurement: ImpedanceMeasurement
 
     # DRT Object containing spectrum and time constants
     drt: DRT
@@ -91,7 +91,7 @@ class Regression(eqx.Module):
         A_matrices: jnp.ndarray,
         lbd: float,
     ) -> float:
-        """Loss Function minimized in regularisation process. Default is Tikhonov Regularisation. RBF discretisation is used when calculating the impedence.
+        """Loss Function minimized in regularisation process. Default is Tikhonov Regularisation. RBF discretisation is used when calculating the Impedance.
 
         Args:
             init_params (jnp.ndarray): Initial parameters which are optimised throughout the regression
@@ -108,7 +108,7 @@ class Regression(eqx.Module):
         # Here we take the absolute value to ensure non negativity
         x = jnp.abs(init_params[2:])
 
-        # Calculate the real and imaginary part of the impedence
+        # Calculate the real and imaginary part of the Impedance
         Z_re = R_inf + A_matrices[0] @ x
         Z_im = 2 * jnp.pi * self.measurement.f * L_0 + A_matrices[1] @ x
 

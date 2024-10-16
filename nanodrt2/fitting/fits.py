@@ -63,7 +63,7 @@ class FittedSpectrum(eqx.Module):
             params (jnp.ndarray): final parameters obtained in optimisation process
             state (dict): state obtained in optimisation process
             tau (jnp.ndarray): time constants used in optimisation process
-            f_vec (jnp.ndarray): frequencies used in optimisation process for the impedence measurement.
+            f_vec (jnp.ndarray): frequencies used in optimisation process for the Impedance measurement.
             integration_method (str): integration method used in optimisation process.
         """
 
@@ -100,10 +100,10 @@ class FittedSpectrum(eqx.Module):
         )
 
     def simulate(self) -> jnp.ndarray:
-        """Simulate the impedence from the optimised values.
+        """Simulate the Impedance from the optimised values.
 
         Returns:
-            jnp.ndarray: Real and Imaginary impedences.
+            jnp.ndarray: Real and Imaginary Impedances.
         """
         drt = DRT(self.R_inf, self.L_0, self.x, self.tau)
 

@@ -3,7 +3,7 @@
 import equinox as eqx
 import jax.numpy as jnp
 from nanodrt2.fitting.fits import FittedSpectrum
-from nanodrt2.drt_solver.measurements import ImpedenceMeasurement
+from nanodrt2.drt_solver.measurements import ImpedanceMeasurement
 import dataclasses
 import seaborn as sns
 from jax import vmap
@@ -14,7 +14,7 @@ class Plot(eqx.Module):
 
     final_sim: FittedSpectrum
 
-    measurement: ImpedenceMeasurement
+    measurement: ImpedanceMeasurement
 
     def __init__(self, final_sim, measurement) -> None:
 

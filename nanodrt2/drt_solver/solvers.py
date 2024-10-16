@@ -36,7 +36,7 @@ class RBFSolver(eqx.Module):
         # First we create A Matrix
         A_mat = self.A_matrix()
 
-        # Obtain the real and imaginary impedence integrals
+        # Obtain the real and imaginary Impedance integrals
         integral_re = A_mat[0]
         integral_im = A_mat[1]
 
@@ -75,15 +75,13 @@ class RBFSolver(eqx.Module):
 
         # Checking which radial basis function to use
         if self.rbf_function == "gaussian":
-            phi = self.gaussian(y, mu=self.mu)  # size (n, )
+            phi = self.gaussian(y, mu=self.mu) 
 
         exponent = y + jnp.log(f_m) + log_tau_n
 
-        factor = 1.0 / (1 + (4.0 * (jnp.pi**2) * jnp.exp(2 * exponent)))  # size (n, )
-        d_y = jnp.abs(y[1] - y[0])
-        return (phi * factor * d_y).sum(
-            axis=-1
-        )  # discretisation? careful with tau and ranges
+        factor = 1.0 / (1 + (4.0 * (jnp.pi**2) * jnp.exp(2 * exponent)))
+        d_y = jnp.abs(y[1] - y[0]) # width of small interval in discretized version of continuous integral
+        return (phi * factor * d_y).sum(axis=-1)  # discretisation? careful with tau and ranges
 
     @eqx.filter_jit
     def A_element_im(self, f_m: float, log_tau_n: float) -> float:
@@ -104,7 +102,7 @@ class RBFSolver(eqx.Module):
 
         # Checking which radial basis function to use
         if self.rbf_function == "gaussian":
-            phi = self.gaussian(y, mu=self.mu)  # size (n, )
+            phi = self.gaussian(y, mu=self.mu) 
 
         exponent = y + jnp.log(f_m) + log_tau_n
         factor = (

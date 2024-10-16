@@ -28,7 +28,7 @@ import pandas as pd
 # How to make this all one import? Tara to do :) 
 from nanodrt.drt_solver.drt import DRT 
 from nanodrt.fitting.optimizer import Optimizer 
-from nanodrt.drt_solver.measurements import ImpedenceMeasurement
+from nanodrt.drt_solver.measurements import ImpedanceMeasurement
 from nanodrt.plotting.plots import Plot 
 from nanodrt.drt_solver.utils import (ZARC, 
                                  gamma_ZARC) 
@@ -41,7 +41,7 @@ df = pd.read_csv("data/single_ZARC.csv")
 tau = 1.0/(2.0*jnp.pi* df["f"].values)
 
 # Create Measurmenet Object 
-measurement = ImpedenceMeasurement(df["Z_re"]df["f"].values, df["Z_im"]df["f"].values, df["f"]df["f"].values)
+measurement = ImpedanceMeasurement(df["Z_re"]df["f"].values, df["Z_im"]df["f"].values, df["f"]df["f"].values)
 
 #Create our DRT guess
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
@@ -188,7 +188,7 @@ Below we give an example that fits the DRT Spectrum to the Double ZARC Model.
 df = pd.read_csv("data/double_ZARC.csv")
 tau = 1.0/(2.0*jnp.pi*df["f"])
 
-measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
+measurement = ImpedanceMeasurement(df["Z_re"], df["Z_im"], df["f"])
 
 drt = DRT(R_inf= 10, L_0=0, gamma=gamma_guess, tau=tau)
 
@@ -209,7 +209,7 @@ plot.show()
 ```
 df = pd.read_csv("data/double_ZARC.csv")
 tau = jnp.flip(jnp.logspace(-8, 4, 100))
-measurement = ImpedenceMeasurement(df["Z_re"], df["Z_im"], df["f"])
+measurement = ImpedanceMeasurement(df["Z_re"], df["Z_im"], df["f"])
 
 gamma_guess = gamma_ZARC(tau, R_ct=33, tau_0=.2, phi= .7)
 

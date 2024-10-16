@@ -6,7 +6,7 @@ from nanodrt2.fitting.regression import Regression
 
 # Ask about typechecking again? Look up...
 from nanodrt2.drt_solver.drt import DRT
-from nanodrt2.drt_solver.measurements import ImpedenceMeasurement
+from nanodrt2.drt_solver.measurements import ImpedanceMeasurement
 
 import json
 
@@ -17,7 +17,7 @@ class Optimizer(eqx.Module):
     """
 
     # Measurment object containing experimental data
-    measurement: ImpedenceMeasurement
+    measurement: ImpedanceMeasurement
 
     # DRT containing intitial guess for parameters and spectrum to be fitted
     drt: DRT
@@ -35,7 +35,7 @@ class Optimizer(eqx.Module):
 
     def __init__(
         self,
-        measurement: ImpedenceMeasurement,
+        measurement: ImpedanceMeasurement,
         drt: DRT,
         solver: str = "regression",
         integration_method: str = "rbf",
@@ -81,7 +81,7 @@ class Optimizer(eqx.Module):
 
     def __validate_init__(self) -> None:
         """Validate the initialization parameters."""
-        if not isinstance(self.measurement, ImpedenceMeasurement):
+        if not isinstance(self.measurement, ImpedanceMeasurement):
             raise TypeError(
                 f"Expected measurement to be an instance of Measurement, got {type(self.measurement)}"
             )

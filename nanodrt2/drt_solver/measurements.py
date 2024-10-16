@@ -6,10 +6,10 @@ import dataclasses
 import jax.numpy as jnp
 from jax import config
 
-config.update("jax_enable_x64", True)
+config.update("jax_enable_x64", True) # enable 64 bit precision (default is 32)
 
 
-class ImpedenceMeasurement(eqx.Module):
+class ImpedanceMeasurement(eqx.Module):
     """
     Class defining the battery measurement
     """
@@ -19,7 +19,7 @@ class ImpedenceMeasurement(eqx.Module):
     Z_im: jnp.ndarray
 
     # Frequencies corresponding to Impedance Arrays
-    f: jnp.array
+    f: jnp.ndarray
 
     # time constant array used for simulations
     tau: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
@@ -67,8 +67,8 @@ class ImpedenceMeasurement(eqx.Module):
         )
 
         return (
-            f"{self.__class__.__name__}(Z_re=Range({Z_re_range}), "
-            f"Z_im=Range({Z_im_range}), f=Range({f_range}))"
+            f"{self.__class__.__name__}(shape={self.f.shape}, "
+            f"(Z_re=Range({Z_re_range}), Z_im=Range({Z_im_range}), f=Range({f_range}))"
         )
 
     def __validate_init__(self) -> None:
@@ -89,8 +89,8 @@ class ImpedenceMeasurement(eqx.Module):
             raise ValueError("Z_re, Z_im, and f must all be of the same length")
 
         # Check for non-negative frequencies
-        if jnp.any(self.f < 0):
-            raise ValueError("Frequencies must be non-negative")
+        if jnp.any(self.f <= 0):
+            raise ValueError("Frequencies must be non-negative and non-zero")
 
         # Check for non-empty arrays
         if self.Z_re.size == 0 or self.Z_im.size == 0 or self.f.size == 0:

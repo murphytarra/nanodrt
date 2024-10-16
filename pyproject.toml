@@ -6,7 +6,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 name = "nanodrt2"
 version = "0.0.0"
 description = "A Fitting Library for EIS DRT Spectroscopy" 
-authors = ["Tara Murphy <tm763@cam.ac.uk>"]  
+authors = ["Tara Murphy <tm763@cam.ac.uk>", "Edward Saunders , <es758@cam.ac.uk>"]  
 readme = "README.md"
 # license = {text = "MIT License"}
 

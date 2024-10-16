@@ -94,10 +94,10 @@ class Simulation(eqx.Module):
     def run(
         self,
     ):
-        """Function which selects and runs the solver to determine the impedence
+        """Function which selects and runs the solver to determine the Impedance
 
         Returns:
-            jnp.ndarray: Real and Imaginary impedence values
+            jnp.ndarray: Real and Imaginary Impedance values
         """
 
         if self.integration_method == "rbf":
