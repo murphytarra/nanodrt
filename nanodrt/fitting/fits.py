@@ -136,7 +136,7 @@ class FittedSpectrum(eqx.Module):
         Returns:
             jnp.ndarray: Real and Imaginary Impedances.
         """
-        drt = DRT(self.R_0, self.L_0, self.x, self.tau)
+        drt = DRT(self.R_0, self.L_0, self.gamma, self.tau)
 
         if self.integration_method == "rbf":
             integrals = RBFSolver(

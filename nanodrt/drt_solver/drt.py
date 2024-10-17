@@ -18,27 +18,27 @@ class DRT(eqx.Module):
     R_0: jnp.ndarray
     L_0: jnp.ndarray
 
-    # Gamma values of DRT spectrum, where gamma is function of ln(tau)
-    x: jnp.ndarray
+    # Gamma values of DRT spectrum
+    gamma: jnp.ndarray
 
     # Corresponding time constants of DRT spectrum
     tau: jnp.ndarray
 
-    def __init__(self, R_0:float, L_0:float, x:jnp.ndarray, tau:jnp.ndarray) -> None:
+    def __init__(self, R_0:float, L_0:float, gamma:jnp.ndarray, tau:jnp.ndarray) -> None:
         """
         Class defining the DRT spectrum of the battery
 
         Args:
             R_0 (_type_, optional): _description_. Defaults to dimensionless jnp.ndarray.
             L_0 (_type_, optional): _description_. Defaults to dimensionless jnp.ndarray.
-            x (_type_, optional): _description_. Defaults to jnp.ndarray.
+            gamma (_type_, optional): _description_. Defaults to jnp.ndarray.
             tau (_type_, optional): _description_. Defaults to jnp.ndarray.
         """
 
         # Convert to jnp.ndarray if not already
         self.R_0 = jnp.asarray(R_0) if not isinstance(R_0, jnp.ndarray) else R_0 # Lumped series resistance
         self.L_0 = jnp.asarray(L_0) if not isinstance(L_0, jnp.ndarray) else L_0 # and inductance of system
-        self.x = jnp.asarray(x) if not isinstance(x, jnp.ndarray) else x
+        self.gamma = jnp.asarray(gamma) if not isinstance(gamma, jnp.ndarray) else gamma
         self.tau = jnp.asarray(tau) if not isinstance(tau, jnp.ndarray) else tau # time constants of DRT
 
     
@@ -52,8 +52,8 @@ class DRT(eqx.Module):
         """
 
         # Format the range of x values if the array is not empty
-        x_range = (
-            f"min={self.x.min()}, max={self.x.max()}" if self.x.size > 0 else "empty"
+        gamma_range = (
+            f"min={self.gamma.min()}, max={self.gamma.max()}" if self.gamma.size > 0 else "empty"
         )
 
         # Format the range of tau values if the array is not empty
@@ -65,7 +65,7 @@ class DRT(eqx.Module):
 
         return (
             f"{self.__class__.__name__}(R_0={self.R_0}, L_0={self.L_0}, "
-            f"DRT_length={self.tau.shape[0]}, DRT_spectrum=Range({x_range}), time_constants=Range({tau_range}))"
+            f"DRT_length={self.tau.shape[0]}, DRT_spectrum=Range({gamma_range}), time_constants=Range({tau_range}))"
         )
 
     def __validate__init__(self) -> None:
@@ -82,8 +82,8 @@ class DRT(eqx.Module):
             raise TypeError("L_0 must be a jnp.ndarray")
         elif self.L_0.size != 1 or self.L_0.shape != ():
             raise ValueError(f"L_0 must be a jnp.ndarray of size 1 and no dimensions, but got size: {self.L_0.size}, shape: {self.L_0.shape}")
-        if not isinstance(self.x, jnp.ndarray):
-            raise TypeError("x must be a jnp.ndarray")
+        if not isinstance(self.gamma, jnp.ndarray):
+            raise TypeError("gamma must be a jnp.ndarray")
         if not isinstance(self.tau, jnp.ndarray):
             raise TypeError("tau must be a jnp.ndarray")
 
@@ -94,9 +94,9 @@ class DRT(eqx.Module):
             raise ValueError("L_0 must be non-negative")
 
         # Check for equal lengths of x and tau
-        if len(self.x) != len(self.tau):
-            raise ValueError("x and tau must be of the same length")
+        if len(self.gamma) != len(self.tau):
+            raise ValueError("gamma and tau must be of the same length")
 
         # Check for non-empty arrays
-        if self.x.size == 0 or self.tau.size == 0:
-            raise ValueError("x and tau must not be empty")
+        if self.gamma.size == 0 or self.tau.size == 0:
+            raise ValueError("gamma and tau must not be empty")

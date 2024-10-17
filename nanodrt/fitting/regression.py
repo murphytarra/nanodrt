@@ -56,7 +56,7 @@ class Regression(eqx.Module):
         maxiter = self.solver_dict["maxiter"]
 
         # Initial Parameters to be fitted in optimization process
-        init_params = jnp.hstack((self.drt.R_0, self.drt.L_0, self.drt.x))
+        init_params = jnp.hstack((self.drt.R_0, self.drt.L_0, self.drt.gamma)) # use gamma values passed as initial guess
 
         if self.integration_method == "rbf":
             # define solver for new loss function
