@@ -4,7 +4,7 @@ import equinox as eqx
 import dataclasses
 
 import jax.numpy as jnp
-from jax import config
+from jax import config, vmap
 
 from nanodrt.drt_solver.solvers import RBFSolver
 
@@ -46,6 +46,9 @@ class FittedSpectrum(eqx.Module):
 
     rbf_function: str = dataclasses.field(default=None)  # type: ignore
     mu: float = dataclasses.field(default=None)  # type: ignore
+
+    # Resulting gamma
+    gamma: jnp.ndarray = dataclasses.field(default=None)  # type: ignore
 
     def __init__(
         self,
@@ -93,11 +96,39 @@ class FittedSpectrum(eqx.Module):
         self.rbf_function = rbf_function
         self.mu = mu
 
+        self.gamma = self.calculate_gamma()
+
     def __repr__(self) -> str:
         return (
             f"FittedSpectrum(params={self.params}, state={self.state}, tau={self.tau}, "
             f"R_0={self.R_0}, L_0={self.L_0}, value={self.value})"
         )
+    
+    def gaussian(self, log_tau_m: float, log_tau_vec: jnp.array, mu: float) -> float:
+        """
+        Guassian Kernal used in RBF discretisation
+
+        Args:
+            log_tau_m (jnp.ndarray): time constant for RBF to be evaluated at
+            mu (float): constant used for guassian filter - determines FWHM
+
+        Returns:
+            float: RBF kernal value
+        """
+        return jnp.exp(-((mu * (log_tau_m - log_tau_vec)) ** 2))
+    
+    def calculate_gamma(self) -> jnp.ndarray:
+        """Calculate the gamma from the optimised solution vector.
+
+        Returns:
+            jnp.ndarray: gamma values.
+        """
+        if self.integration_method == "rbf":
+            phi = vmap(self.gaussian, in_axes=(0, None, None))(
+                self.log_t_vec, self.log_t_vec, self.mu
+            ) 
+            gamma = (self.x * phi).sum(axis=1)
+        return gamma
 
     def simulate(self) -> jnp.ndarray:
         """Simulate the Impedance from the optimised values.

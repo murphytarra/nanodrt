@@ -18,10 +18,10 @@ class DRT(eqx.Module):
     R_0: jnp.ndarray
     L_0: jnp.ndarray
 
-    # DRT spectrum for battery device
+    # Gamma values of DRT spectrum, where gamma is function of ln(tau)
     x: jnp.ndarray
 
-    # Corresponding time constants with DRT spectrum
+    # Corresponding time constants of DRT spectrum
     tau: jnp.ndarray
 
     def __init__(self, R_0:float, L_0:float, x:jnp.ndarray, tau:jnp.ndarray) -> None:
@@ -40,6 +40,8 @@ class DRT(eqx.Module):
         self.L_0 = jnp.asarray(L_0) if not isinstance(L_0, jnp.ndarray) else L_0 # and inductance of system
         self.x = jnp.asarray(x) if not isinstance(x, jnp.ndarray) else x
         self.tau = jnp.asarray(tau) if not isinstance(tau, jnp.ndarray) else tau # time constants of DRT
+
+    
 
         self.__validate__init__()
 
